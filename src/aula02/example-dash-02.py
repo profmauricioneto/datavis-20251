@@ -2,18 +2,13 @@ from dash import Dash, dcc, html, Input, Output, callback
 import pandas as pd
 import plotly.express as px
 
-# Iniciar o app
 app = Dash(__name__)
 
-# Layout do app
 app.layout = html.Div([
-    # Título
     html.H1("Dashboard Interativo do Dataset Iris com dcc.Store", style={'textAlign': 'center'}),
     
-    # Armazenar dados no dcc.Store
     dcc.Store(id='stored-data'),  # Armazena o dataset Iris
     
-    # Controles
     html.Div([
         html.Label("Selecione a coluna para o eixo X:"),
         dcc.Dropdown(id='x-axis-dropdown'),
@@ -25,7 +20,6 @@ app.layout = html.Div([
         dcc.Checklist(id='species-filter', labelStyle={'display': 'block'})
     ], style={'width': '20%', 'padding': '20px', 'display': 'inline-block'}),
     
-    # Gráfico e estatísticas
     html.Div([
         dcc.Graph(id='scatter-plot'),
         html.Div(id='summary-stats', style={'marginTop': '20px'})
@@ -33,11 +27,10 @@ app.layout = html.Div([
 ])
 
 def load_data(_):
-    # Carregar o dataset Iris
     df = px.data.iris()
     
     # Criar opções para os dropdowns
-    x_options = [{'label': col, 'value': col} for col in df.columns[:4]]  # Colunas numéricas
+    x_options = [{'label': col, 'value': col} for col in df.columns[:4]] 
     y_options = x_options.copy()
     species_options = [{'label': sp, 'value': sp} for sp in df['species'].unique()]
     
@@ -57,29 +50,23 @@ def update_graph(stored_data, x_col, y_col, selected_species):
     if stored_data is None or x_col is None or y_col is None:
         return {}, "Selecione colunas válidas."
     
-    # Converter dados armazenados de volta para DataFrame
     df = pd.DataFrame(stored_data)
-    
-    # Filtrar dados com base nas espécies selecionadas
     filtered_df = df[df['species'].isin(selected_species)]
     
-    # Criar gráfico de dispersão
     fig = px.scatter(
         filtered_df,
         x=x_col,
         y=y_col,
-        color='species',  # Colorir por espécie
+        color='species',
         title=f"{x_col} vs {y_col}",
         height=500
     )
     
-    # Calcular estatísticas descritivas
     stats = filtered_df.groupby('species').agg({
         x_col: ['mean', 'std'],
         y_col: ['mean', 'std']
     }).reset_index()
     
-    # Formatar tabela de estatísticas
     stats_table = html.Div([
         html.H4("Estatísticas por Espécie:"),
         html.Table([
@@ -98,6 +85,5 @@ def update_graph(stored_data, x_col, y_col, selected_species):
     
     return fig, stats_table
 
-# Executar o app
 if __name__ == '__main__':
     app.run_server(debug=True)
