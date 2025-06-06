@@ -27,13 +27,12 @@ app.layout = html.Div([
 ])
 
 
-# 🟢 Callback para carregar os dados e preencher os componentes de entrada
 @callback(
     Output('stored-data', 'data'),
     Output('x-axis-dropdown', 'options'),
     Output('y-axis-dropdown', 'options'),
     Output('species-filter', 'options'),
-    Input('scatter-plot', 'id')  # Usado apenas para disparar o carregamento inicial
+    Input('scatter-plot', 'id')  
 )
 def load_data(_):
     df = px.data.iris()
@@ -46,7 +45,6 @@ def load_data(_):
     return df.to_dict('records'), x_options, y_options, species_options
 
 
-# 🟢 Callback para atualizar o gráfico e estatísticas
 @callback(
     Output('scatter-plot', 'figure'),
     Output('summary-stats', 'children'),
